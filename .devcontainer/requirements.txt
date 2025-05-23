@@ -1,0 +1,6 @@
+urllib3<2
+flake8
+pytest
+pytest-cov
+requests-mock
+black
