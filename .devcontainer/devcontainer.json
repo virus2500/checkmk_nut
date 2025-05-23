@@ -4,9 +4,18 @@
     "name": "Checkmk",
     "build": {
         "dockerfile": "Dockerfile",
-        "args": { "VARIANT": "2.4.0-latest" }
+        "args": {
+	    "VARIANT": "2.4.0-latest",
+	        // "HTTP_PROXY": "http://192.168.127.254:3128/",
+    		// "HTTPS_PROXY": "http://192.168.127.254:3128/",
+    		// "NO_PROXY": "localhost,127.0.0.0/8,::1,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,.magenta.at,.t-mobile.at,.tmobile.at"
+	}
     },
-
+    "forwardPorts": [5000],
+    // "runArgs": [
+    //     "--env", "HTTP_PROXY=http://192.168.127.254:3128",
+    //     "--env", "HTTPS_PROXY=http://192.168.127.254:3128"
+    // ],
     "customizations": {
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created.
@@ -29,11 +38,11 @@
     // Mount complete volume for site directories
     "mounts": [
         // { "source": "omd-sites", "target": "/opt/omd/sites", "type": "volume" },
-        { "source": "${localWorkspaceFolder}/local/share/check_mk/agents", "target": "/opt/omd/sites/cmk/local/share/check_mk/agents", "type": "bind"},
+	    { "source": "${localWorkspaceFolder}/local/share/check_mk/agents", "target": "/opt/omd/sites/cmk/local/share/check_mk/agents", "type": "bind"},
         { "source": "${localWorkspaceFolder}/lib", "target": "/opt/omd/sites/cmk/local/lib/python3/cmk", "type": "bind"},
         { "source": "${localWorkspaceFolder}/plugins", "target": "/opt/omd/sites/cmk/local/lib/python3/cmk_addons/plugins", "type": "bind" },
         { "source": "${localWorkspaceFolder}/plugins_legacy", "target": "/opt/omd/sites/cmk/local/share/check_mk", "type": "bind"},
-        { "source": "${localWorkspaceFolder}/tmp/testoutput", "target": "/opt/omd/sites/cmk/tmp/testoutput", "type": "bind"}
+        { "source": "${localWorkspaceFolder}/temp/agent-output.txt", "target": "/opt/omd/sites/cmk/tmp/agent-output.txt", "type": "bind"}
     ],
 
     // Use 'postCreateCommand' to run commands after the container is created.
