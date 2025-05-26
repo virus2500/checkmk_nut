@@ -55,7 +55,7 @@ def _migrate(value: object) -> Mapping[str, object]:
             else:
                 # Only recurse into dicts
                 out[k] = _migrate(v) if isinstance(v, dict) else convert_levels(v)
-        print(out)
+        # print(out)
         return out
 
     result = convert_levels(value)
