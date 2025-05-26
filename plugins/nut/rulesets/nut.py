@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Description:
+    This module defines the rule specifications for monitoring UPS (Uninterruptible Power Supply) parameters
+    using Network UPS Tools (NUT).
+'''
 from cmk.rulesets.v1.form_specs import (
     DictElement,
     LevelDirection,
