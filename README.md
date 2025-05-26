@@ -1,19 +1,43 @@
-# Checkmk extension devcontainer template
+# Checkmk Extension: Network UPS Tools (NUT) Monitoring
 
-## Description
+This project is a Checkmk extension designed to monitor UPS (Uninterruptible Power Supply) data using [Network UPS Tools (NUT)](https://networkupstools.org/).
 
-This is a template to develop Checkmk Extensions derived from the original made by [Marius Rieder](https://github.com/jiuka/)
+It provides comprehensive monitoring capabilities, including metrics for battery charge, runtime, voltage, input/output frequencies, and more.
 
-## Development
+Additionally, it includes an agent bakery implementation to automate the deployment of the `nut.sh` plugin for Checkmk agents.
 
-For the best development experience use [VSCode](https://code.visualstudio.com/) with the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension. This maps your workspace into a checkmk docker container giving you access to the python environment and libraries the installed extension has.
+## Features
 
-## Directories
+- **UPS Monitoring**:
+  - Monitors key UPS metrics such as battery charge, runtime, voltage, input/output frequencies, load, and temperature.
+  - Supports customizable thresholds for warnings and critical states.
+  - Provides detailed status checks for UPS states (e.g., "On battery," "Low battery," "Overloaded").
 
-The following directories in this repo are getting mapped into the Checkmk site.
+- **Agent Bakery Integration**:
+  - Automates the deployment of the `nut.sh` plugin to hosts via the Checkmk agent bakery.
+  - Configurable deployment rules for enabling or disabling the plugin on specific hosts.
 
-* `agents`, `checkman`, `checks`, `doc`, `inventory`, `notifications`, `web` are mapped into `local/share/check_mk/`
-* `agent_based` is mapped to `local/lib/check_mk/base/plugins/agent_based`
-* `nagios_plugins` is mapped to `local/lib/nagios/plugins`
-* `bakery` is mapped to `local/lib/check_mk/base/cee/plugins/bakery`
-* `temp` is mapped to `local/tmp` for storing precreated agent output
+- **Graphing and Visualization**:
+  - Includes predefined metrics for graphing UPS data in Checkmk.
+  - Visualizes metrics such as battery charge, runtime, voltage, and load with color-coded graphs.
+
+## Installation
+
+Download the latest mkp (zipped) from the releases page.
+Install the unzipped mkp either via the GUI or via the CLI.
+
+See [MPK install](https://docs.checkmk.com/latest/en/mkps.html) for more information
+
+## Contributing
+Contributions are welcome! If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
+
+## License
+This project is licensed under the GNU General Public License v2. See the LICENSE file for details.
+
+## Acknowledgments
+Inspired by the original NUT plugin by Daniel Karni and Marcel Pennewiss.
+
+## References
+[Network UPS Tools (NUT)](https://networkupstools.org/)
+
+[Checkmk](https://checkmk.com/)

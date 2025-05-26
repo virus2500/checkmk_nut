@@ -33,7 +33,7 @@ def _parameter_form_bakery() -> Dictionary:
             "deploy": DictElement(
                 required=True,
                 parameter_form=SingleChoice(
-                    title=Title("NUT agent plugin deployment"),
+                    title=Title("Network UPS Tools agent plugin deployment"),
                     help_text=Help(
                         "Hosts configured via this rule get \
                         the <tt>NUT</tt> plugin"
@@ -57,7 +57,7 @@ def _parameter_form_bakery() -> Dictionary:
 
 rule_spec_bakery_nut = AgentConfig(
     name="nut",
-    title=Title("NUT agent plugin"),
+    title=Title("Network UPS Tools agent plugin"),
     topic=Topic.APPLICATIONS,
     parameter_form=_parameter_form_bakery,
 )
