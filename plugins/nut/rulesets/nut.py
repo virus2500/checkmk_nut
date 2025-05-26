@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from cmk.rulesets.v1.form_specs import (
     DictElement,
     LevelDirection,
@@ -100,15 +102,6 @@ def _parameter_valuespec_nut():
                     }
                 )
             ),
-            "input_voltage_fault": DictElement(
-                parameter_form=SimpleLevels(
-                    title=Title("Input voltage fault"),
-                    help_text=Help("Set the levels for the minimum voltage of the input."),
-                    form_spec_template=Integer(unit_symbol="V"),
-                    level_direction=LevelDirection.UPPER,
-                    prefill_fixed_levels=DefaultValue(value=(155, 160)),
-                )
-            ),
             "output_voltage": DictElement(
                 parameter_form=Dictionary(
                     title=Title("Output voltage"),
@@ -132,6 +125,15 @@ def _parameter_valuespec_nut():
                             )
                         ),
                     }
+                )
+            ),
+            "input_voltage_fault": DictElement(
+                parameter_form=SimpleLevels(
+                    title=Title("Input voltage fault"),
+                    help_text=Help("Set the levels for the minimum voltage of the input."),
+                    form_spec_template=Integer(unit_symbol="V"),
+                    level_direction=LevelDirection.UPPER,
+                    prefill_fixed_levels=DefaultValue(value=(155, 160)),
                 )
             ),
             "ups_beeper_status": DictElement(
@@ -165,7 +167,7 @@ def _parameter_valuespec_nut():
                                 help_text=Help("Warning/Critical when UPS load is too high."),
                                 form_spec_template=Float(unit_symbol="%"),
                                 level_direction=LevelDirection.UPPER,
-                                prefill_fixed_levels=DefaultValue(value=(80.0, 90.0)),
+                                prefill_fixed_levels=DefaultValue(value=(50.0, 70.0)),
                             )
                         ),
                     }
@@ -176,8 +178,8 @@ def _parameter_valuespec_nut():
                     title=Title("Temperature (upper threshold)"),
                     help_text=Help("Set the levels for the temperature of the UPS."),
                     form_spec_template=Integer(unit_symbol="°C"),
-                    level_direction=LevelDirection.LOWER,
-                    prefill_fixed_levels=DefaultValue(value=(35, 30)),
+                    level_direction=LevelDirection.UPPER,
+                    prefill_fixed_levels=DefaultValue(value=(35, 40)),
                 )
             ),
         }

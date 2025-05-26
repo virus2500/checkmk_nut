@@ -186,8 +186,8 @@ _METRIC_SPECS: Mapping[str, Tuple[str, Callable, bool, bool, bool]] = {
 
 
 _STATUS_SPECS: Mapping[str, Tuple[State, str]] = {
-    # 'Status': (State, 'State summary')
-    # based on https://github.com/networkupstools/nut/blob/master/docs/new-drivers.txt ("Status data")
+    # 'Status': (State, 'State summary') based on
+    # https://github.com/networkupstools/nut/blob/master/docs/new-drivers.txt ("Status data")
     'OL': (State.OK, 'On line'),
     'OB': (State.WARN, 'On battery'),
     'LB': (State.CRIT, 'Low battery'),
@@ -216,7 +216,10 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
     Yields:
         CheckResult: A series of results based on UPS status and metric checks.
     '''
+    # print(params)
     ups_data = section.get(item)
+
+    # Check if the UPS data is available
     if ups_data is None:
         yield Result(
             state=State.UNKNOWN,
@@ -224,7 +227,10 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
         )
         return
 
+    # Check UPS status
+    # print(f"Checking UPS: {item}")
     for status in ups_data['ups_status'].split():
+        # print(f"Status: {status}")
         if status in _STATUS_SPECS:
             yield Result(
                 state=_STATUS_SPECS[status][0],
@@ -249,7 +255,7 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
 
     # Check all metrics
     for metric in ups_data:
-
+        # print(f"Metric: {metric}, Value: {ups_data[metric]}")
         # Ignore unspecified metrics
         if metric not in _METRIC_SPECS:
             continue
@@ -258,13 +264,22 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
         if metric == 'battery_voltage':
             ups_data[metric] = ups_data[metric] * ups_data.get('battery_packs', 1)
 
+        metric_params = params.get(metric)
+
+        if isinstance(metric_params, dict):
+            levels_lower = metric_params.get("lower", None)
+            levels_upper = metric_params.get("upper", None)
+        else:
+            # If metric_params is a simple value (like a fixed threshold),
+            levels_lower = metric_params if metric_params is not None else None
+            levels_upper = None
+
         yield from check_levels(
             ups_data[metric],
             metric_name=f"nut_{metric}",
             label=_METRIC_SPECS[metric][0],
-            # Todo: add levels_lower and levels_upper
-            # levels_lower=levels_lower,
-            # levels_upper=levels_upper,
+            levels_lower=levels_lower,
+            levels_upper=levels_upper,
             render_func=_METRIC_SPECS[metric][1],
             notice_only=_METRIC_SPECS[metric][2],
             boundaries=(0, None),
@@ -284,16 +299,28 @@ check_plugin_nut = CheckPlugin(
     check_function=check_nut,
     sections=["nut"],
     check_default_parameters={
-        # 'battery_charge': ("fixed", (90, 85)),
-        # 'battery_runtime': ("fixed", (1200, 900)),
-        # 'battery_voltage': ("fixed", (10, 5)),
-        # 'input_frequency': (45, 49, 51, 55),
-        # 'input_voltage': ("fixed", (0, 0, 245, 250)),
-        # 'input_voltage_fault': ("fixed", (155, 160)),
-        # 'output_voltage': ("fixed", (0, 0, 245, 250)),
-        # 'ups_beeper_status': 'disabled',
-        # 'ups_load': ("fixed", (0, 0, 50, 70)),
-        # 'ups_temperature': ("fixed", (35, 40)),
+        'battery_charge': ("fixed", (90, 85)),
+        'battery_runtime': ("fixed", (1200, 900)),
+        'battery_voltage': ("fixed", (10, 5)),
+        'input_frequency': {
+            'lower': ('fixed', (49, 45)),
+            'upper': ('fixed', (51, 55))
+        },
+        'input_voltage': {
+            'lower': ('fixed', (0, 0)),
+            'upper': ('fixed', (245, 250))
+        },
+        'output_voltage': {
+            'lower': ('fixed', (0, 0)),
+            'upper': ('fixed', (245, 250))
+        },
+        'input_voltage_fault': ("fixed", (155, 160)),
+        'ups_beeper_status': 'enabled',
+        'ups_load': {
+            'lower': ('fixed', (0, 0)),
+            'upper': ('fixed', (50, 70))
+        },
+        'ups_temperature': ("fixed", (35, 40)),
     },
     check_ruleset_name="nut",
 )
