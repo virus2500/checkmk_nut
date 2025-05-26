@@ -5,7 +5,7 @@ Description:
     This module defines the rule specifications for monitoring UPS (Uninterruptible Power Supply) parameters
     using Network UPS Tools (NUT).
 '''
-# from collections.abc import Mapping
+from collections.abc import Mapping
 
 from cmk.rulesets.v1.form_specs import (
     DictElement,
@@ -29,38 +29,42 @@ from cmk.rulesets.v1.rule_specs import (
 from cmk.rulesets.v1 import Title
 
 
-# def _migrate(value: object) -> Mapping[str, object]:
-#     print(value)
+def _migrate(value: object) -> Mapping[str, object]:
+    def convert_levels(v):
+        # Don't re-wrap if already migrated
+        if isinstance(v, tuple):
+            if len(v) == 2 and v[0] == "fixed" and isinstance(v[1], tuple):
+                return v
+            elif len(v) == 2:
+                return ("fixed", (int(v[0]), int(v[1])))
+            elif len(v) == 4:
+                return {
+                    "lower": ("fixed", (int(v[0]), int(v[1]))),
+                    "upper": ("fixed", (int(v[2]), int(v[3]))),
+                }
+        return v
 
-#     def convert_levels(v):
-#         if isinstance(v, tuple):
-#             if len(v) == 2:
-#                 return {'levels': {'warning': v[0], 'critical': v[1]}}
-#             elif len(v) == 4:
-#                 return {
-#                     'lower': {'levels': {'warning': v[0], 'critical': v[1]}},
-#                     'upper': {'levels': {'warning': v[2], 'critical': v[3]}},
-#                 }
-#         return v
+    if isinstance(value, dict):
+        out = {}
+        for k, v in value.items():
+            if k == "input_frequency" and isinstance(v, tuple) and len(v) == 4:
+                out[k] = {
+                    "lower": ("fixed", (int(v[0]), int(v[1]))),
+                    "upper": ("fixed", (int(v[2]), int(v[3]))),
+                }
+            else:
+                # Only recurse into dicts
+                out[k] = _migrate(v) if isinstance(v, dict) else convert_levels(v)
+        print(out)
+        return out
 
-#     if isinstance(value, dict):
-#         out = {}
-#         for k, v in value.items():
-#             if k == "input_frequency" and isinstance(v, tuple) and len(v) == 4:
-#                 out[k] = {
-#                     "lower": {'levels': {'warning': v[0], 'critical': v[1]}},
-#                     "upper": {'levels': {'warning': v[2], 'critical': v[3]}},
-#                 }
-#             else:
-#                 out[k] = _migrate(v) if isinstance(v, (dict, tuple)) else v
-#         return out
-
-#     return convert_levels(value)
+    result = convert_levels(value)
+    return result
 
 
 def _parameter_valuespec_nut():
     return Dictionary(
-        # migrate=_migrate,
+        migrate=_migrate,
         elements={
             "battery_charge": DictElement(
                 parameter_form=SimpleLevels(
