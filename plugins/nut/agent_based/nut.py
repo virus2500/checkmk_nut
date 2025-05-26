@@ -6,9 +6,9 @@ Module for the NUT agent-based check.
 This module parses the output from the NUT UPS monitoring tool, discovers available UPS services,
 and performs checks against defined thresholds.
 '''
-# (c) 2022-2023 Marcel Pennewiss <opensource@pennewiss.de>
 
 # Contributions:
+# 2022-2023 Marcel Pennewiss <opensource@pennewiss.de>
 # Christian Kreidl (christian.kreidl@ziti.uni-heidelberg.de)
 # Marco (github.com/Marco98)
 
