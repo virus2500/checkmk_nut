@@ -39,15 +39,20 @@ jobs:
           echo "PKGNAME: ${{ steps.cmkpkg.outputs.pkgname }}"
           echo "PKGVERSION: ${{ steps.cmkpkg.outputs.pkgversion }}"
 
+      - name: Debug GitHub context
+        run: |
+          echo "server_url: ${{ github.server_url }}"
+          echo "host: ${{ github.host }}"
+
       - name: Upload artifact (GitHub)
-        if: startsWith(github.server_url, 'https://github.com')
+        if: github.host == 'github.com'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
       - name: Upload artifact (Gitea)
-        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
+        if: github.host != 'github.com'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
