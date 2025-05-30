@@ -1,21 +1,18 @@
-{
-    'author': u'',
-    'description': u'',
-    'download_url': '',
-    'files': {
-        'agent_based': [],
-        'agents': [],
-        'checkman': [],
-        'checks': [],
-        'doc': [],
-        'inventory': [],
-        'notifications': [],
-        'pnp-templates': [],
-        'web': []
-    },
-    'name': '',
-    'title': u'',
-    'version': '0.1',
-    'version.min_required': '2.0.0',
-    'version.packaged': '2.0.0'
-}
+{'author': 'Michael Kronika',
+ 'description': 'Monitor health statistics of UPS units supported by Network '
+                'UPS Tools\n',
+ 'download_url': 'http://need.an.url',
+ 'files': {'agents': ['plugins/nut.sh'],
+           'cmk_addons_plugins': ['nut/agent_based/nut.py',
+                                  'nut/checkman/nut',
+                                  'nut/graphing/nut.py',
+                                  'nut/rulesets/cee/__init__.py',
+                                  'nut/rulesets/cee/bakery_nut.py',
+                                  'nut/rulesets/nut.py'],
+           'lib': ['check_mk/base/cee/plugins/bakery/bakery_nut.py']},
+ 'name': 'nut',
+ 'title': 'Network UPS Tools',
+ 'version': '3.0.2',
+ 'version.min_required': '2.3.0b1',
+ 'version.packaged': '2.4.0p2',
+ 'version.usable_until': None}

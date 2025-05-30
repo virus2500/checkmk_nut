@@ -3,9 +3,9 @@ name: build
 on:
   push:
     branches:
-    - '**'
-    tags-ignore:
-    - 'v*'
+      - '**'
+    tags:
+      - 'v*.*.*'
   pull_request:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     name: Build Checkmk package
     runs-on: ubuntu-latest
     container:
-      image: checkmk/check-mk-raw:2.4.0-latest
+      image: gitea.home.lan/mkronika/check-mk-cloud-2.4:latest
 
     env:
       OMD_ROOT: /omd/sites/cmk
@@ -32,8 +32,45 @@ jobs:
       - name: Build Extension
         run: .devcontainer/build.sh
         id: cmkpkg
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
+      - name: Debug package outputs
+        run: |
+          echo "PKGFILE: ${{ steps.cmkpkg.outputs.pkgfile }}"
+          echo "PKGNAME: ${{ steps.cmkpkg.outputs.pkgname }}"
+          echo "PKGVERSION: ${{ steps.cmkpkg.outputs.pkgversion }}"
+      - name: Upload artifact (always)
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
+
+      - name: Get Current Date for Body (optional)
+        id: get_current_date
+        run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
+
+      # - name: Create Gitea Release and Upload Asset
+      #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+      #   uses: akkuman/gitea-release-action@v1
+      #   env:
+      #     NODE_OPTIONS: '--experimental-fetch' # if nodejs < 18
+      #   with:
+      #     GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+      #     tag_name: ${{ github.ref_name }}
+      #     release_name: Release ${{ github.ref_name }}
+      #     body: |
+      #       ## Release Notes for ${{ github.ref_name }}
+
+      #       This is an automated release for version `${{ github.ref_name }}`.
+
+      #       **Build Date:** ${{ steps.get_current_date.outputs.date }}
+      #     draft: false
+      #     prerelease: false
+      #     files: |
+      #       ${{ steps.cmkpkg.outputs.pkgfile }}
+
+      # Doesn't work either
+      # - name: Save release asset (on tag only)
+      #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+      #   run: |
+      #     mkdir -p release
+      #     cp "${{ steps.cmkpkg.outputs.pkgfile }}" release/
+      #     echo "Saved release asset to ./release"

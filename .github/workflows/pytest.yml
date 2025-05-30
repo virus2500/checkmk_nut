@@ -8,7 +8,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: checkmk/check-mk-raw:2.4.0-latest
+      image: gitea.home.lan/mkronika/check-mk-cloud-2.4:latest
 
     env:
       OMD_ROOT: /omd/sites/cmk

@@ -1,15 +1,23 @@
 #!/bin/bash
+set -e
 
-NAME=$(python -c 'print(eval(open("package").read())["name"])')
-rm /omd/sites/cmk/var/check_mk/packages/* ||:
-ln -s $WORKSPACE/package /omd/sites/cmk/var/check_mk/packages/$NAME
+export OMD_ROOT="/omd/sites/cmk"
 
-mkp -v pack $NAME
+NAME=$(python -c 'import ast; print(ast.literal_eval(open("package").read())["name"])')
+echo $NAME
+rm /omd/sites/cmk/var/check_mk/packages/* || true
+ln -s "$WORKSPACE/package" "$OMD_ROOT/var/check_mk/packages/$NAME"
 
-# Set Outputs for GitHub Workflow steps
-if [ -n "$GITHUB_WORKSPACE" ]; then
-    echo "::set-output name=pkgfile::$(ls *.mkp)"
-    echo "::set-output name=pkgname::${NAME}"
-    VERSION=$(python -c 'print(eval(open("package").read())["version"])')
-    echo "::set-output name=pkgversion::$VERSION"
+mkp -v package "$OMD_ROOT/var/check_mk/packages/$NAME"
+
+if [ -n "$GITHUB_OUTPUT" ]; then
+  VERSION=$(python -c 'import ast; print(ast.literal_eval(open("package").read())["version"])')
+  cp /opt/omd/sites/cmk/var/check_mk/packages_local/$NAME\-$VERSION.mkp .
+  PKGFILE=$(ls *.mkp 2>/dev/null || true)
+
+  {
+    echo "pkgfile=$PKGFILE"
+    echo "pkgname=$NAME"
+    echo "pkgversion=$VERSION"
+  } >>"$GITHUB_OUTPUT"
 fi

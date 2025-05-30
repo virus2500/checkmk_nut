@@ -51,38 +51,38 @@ from cmk.agent_based.v2 import (
 '''example output from nut
 # <<<nut>>>
 # ==> demo_ups <==
-# demo_ups battery.charge: 100
-# demo_ups battery.packs: 6
-# demo_ups battery.runtime: 788
-# demo_ups battery.voltage: 2.16
-# demo_ups battery.voltage.high: 62.4
-# demo_ups battery.voltage.low: 78
-# demo_ups battery.voltage.nominal: 12
-# demo_ups device.type: ups
-# demo_ups driver.flag.novendor: enabled
-# demo_ups driver.name: blazer_usb
-# demo_ups driver.parameter.pollinterval: 2
-# demo_ups driver.parameter.port: auto
-# demo_ups driver.parameter.productid: 0005
-# demo_ups driver.parameter.protocol: megatec
-# demo_ups driver.parameter.runtimecal: 270,100,594,50
-# demo_ups driver.parameter.subdriver: phoenix
-# demo_ups driver.parameter.vendorid: 06da
-# demo_ups driver.version: 2.7.2
-# demo_ups driver.version.internal: 0.11
-# demo_ups input.frequency: 50.0
-# demo_ups input.voltage: 238.0
-# demo_ups input.voltage.fault: 0.0
-# demo_ups output.voltage: 229.9
-# demo_ups ups.beeper.status: disabled
-# demo_ups ups.delay.shutdown: 30
-# demo_ups ups.delay.start: 180
-# demo_ups ups.load: 39
-# demo_ups ups.productid: 0005
-# demo_ups ups.status: OL
-# demo_ups ups.temperature: 27.8
-# demo_ups ups.type: online
-# demo_ups ups.vendorid: 06da
+# battery.charge: 100
+# battery.packs: 6
+# battery.runtime: 788
+# battery.voltage: 2.16
+# battery.voltage.high: 62.4
+# battery.voltage.low: 78
+# battery.voltage.nominal: 12
+# device.type: ups
+# driver.flag.novendor: enabled
+# driver.name: blazer_usb
+# driver.parameter.pollinterval: 2
+# driver.parameter.port: auto
+# driver.parameter.productid: 0005
+# driver.parameter.protocol: megatec
+# driver.parameter.runtimecal: 270,100,594,50
+# driver.parameter.subdriver: phoenix
+# driver.parameter.vendorid: 06da
+# driver.version: 2.7.2
+# driver.version.internal: 0.11
+# input.frequency: 50.0
+# input.voltage: 238.0
+# input.voltage.fault: 0.0
+# output.voltage: 229.9
+# ups.beeper.status: disabled
+# ups.delay.shutdown: 30
+# ups.delay.start: 180
+# ups.load: 39
+# ups.productid: 0005
+# ups.status: OL
+# ups.temperature: 27.8
+# ups.type: online
+# ups.vendorid: 06da
 '''
 
 Metrics = Dict[str, int]
