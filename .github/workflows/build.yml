@@ -8,13 +8,12 @@ on:
       - 'v*.*.*'
   pull_request:
 
-
 jobs:
-  build:
+  build_package: # Renamed from 'build' to be more descriptive
     name: Build Checkmk package
     runs-on: ubuntu-latest
     container:
-      image:  ${{ vars.CHECK_MK_IMAGE }}
+      image: ${{ vars.CHECK_MK_IMAGE }}
 
     env:
       OMD_ROOT: /omd/sites/cmk
@@ -25,14 +24,19 @@ jobs:
     steps:
       - name: Initialize Checkmk Site
         run: /docker-entrypoint.sh /bin/true
+
       - uses: actions/checkout@v2
+
       - name: Setup links
         run: .devcontainer/symlink.sh
+
       - name: Update GITHUB_PATH
         run: echo "/omd/sites/cmk/bin" >> $GITHUB_PATH
+
       - name: Build Extension
         run: .devcontainer/build.sh
-        id: cmkpkg
+        id: cmkpkg # ID to capture outputs
+
       - name: Debug package outputs
         run: |
           echo "PKGFILE: ${{ steps.cmkpkg.outputs.pkgfile }}"
@@ -44,40 +48,71 @@ jobs:
           echo "server_url: ${{ github.server_url }}"
           echo "host: ${{ github.host }}"
 
-      - name: Upload artifact (GitHub)
-        uses: actions/upload-artifact@v4
+      - name: Upload mkp artifact for subsequent jobs
+        uses: actions/upload-artifact@v4 # Use v4 as it's generally compatible for internal transfer
         with:
-          name: ${{ steps.cmkpkg.outputs.pkgfile }}
+          name: built-mkp-artifact # A fixed name for the artifact for later download
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
       - name: Get Current Date for Body (optional)
         id: get_current_date
         run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
 
-      # - name: Create Gitea Release and Upload Asset
-      #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
-      #   uses: akkuman/gitea-release-action@v1
-      #   env:
-      #     NODE_OPTIONS: '--experimental-fetch' # if nodejs < 18
-      #   with:
-      #     GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
-      #     tag_name: ${{ github.ref_name }}
-      #     release_name: Release ${{ github.ref_name }}
-      #     body: |
-      #       ## Release Notes for ${{ github.ref_name }}
+  ---
+  upload_to_github:
+    name: Upload to GitHub
+    runs-on: ubuntu-latest # GitHub-hosted runner for GitHub uploads
+    needs: build_package # This job depends on the successful build
+    if: ${{ startsWith(github.server_url, 'https://github.com') }} # Only run on GitHub
 
-      #       This is an automated release for version `${{ github.ref_name }}`.
+    steps:
+      - name: Download built mkp artifact
+        uses: actions/download-artifact@v4 # Download the artifact from the build_package job
+        with:
+          name: built-mkp-artifact
+          path: . # Download to the current directory
 
-      #       **Build Date:** ${{ steps.get_current_date.outputs.date }}
-      #     draft: false
-      #     prerelease: false
-      #     files: |
-      #       ${{ steps.cmkpkg.outputs.pkgfile }}
+      - name: Get artifact filename
+        id: get_pkg_name
+        run: |
+          # Use the output from the build_package job directly if you can pass it,
+          # or assume a known name, or find it in the downloaded path.
+          # For simplicity and robustness, let's re-use cmkpkg.outputs.pkgfile
+          # assuming it's consistent.
+          # Note: If cmkpkg.outputs.pkgfile was truly dynamic and not needed elsewhere,
+          # you might need to list the directory to find the file name after download.
+          # For now, let's assume `built-mkp-artifact` downloaded a single file
+          # and we can find its name.
+          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT" # Find the .mkp file
 
-      # Doesn't work either
-      # - name: Save release asset (on tag only)
-      #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
-      #   run: |
-      #     mkdir -p release
-      #     cp "${{ steps.cmkpkg.outputs.pkgfile }}" release/
-      #     echo "Saved release asset to ./release"
+      - name: Upload mkp artifact (GitHub)
+        uses: actions/upload-artifact@v4 # Specific version for GitHub
+        with:
+          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
+          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
+
+  ---
+  upload_to_gitea:
+    name: Upload to Gitea
+    runs-on: self-hosted # Use your Gitea runner label here
+    needs: build_package # This job depends on the successful build
+    if: ${{ !startsWith(github.server_url, 'https://github.com') }} # Only run if NOT on GitHub (i.e., on Gitea)
+
+    steps:
+      - name: Download built mkp artifact
+        uses: actions/download-artifact@v4 # Download the artifact from the build_package job
+        with:
+          name: built-mkp-artifact
+          path: . # Download to the current directory
+
+      - name: Get artifact filename
+        id: get_pkg_name
+        run: |
+          # Same logic as above for retrieving the filename
+          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT" # Find the .mkp file
+
+      - name: Upload mkp artifact (Gitea)
+        uses: actions/upload-artifact@v3 # Specific version for Gitea (due to Node.js compatibility)
+        with:
+          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
+          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
