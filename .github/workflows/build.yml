@@ -45,15 +45,7 @@ jobs:
           echo "host: ${{ github.host }}"
 
       - name: Upload artifact (GitHub)
-        if: ${{ startsWith(github.server_url, 'https://github.com') }}
         uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.cmkpkg.outputs.pkgfile }}
-          path: ${{ steps.cmkpkg.outputs.pkgfile }}
-
-      - name: Upload artifact (Gitea)
-        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
-        uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
