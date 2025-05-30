@@ -8,7 +8,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ${{ check_mk_image}}
+      image: ${{ env.check_mk_image }}
 
     env:
       OMD_ROOT: /omd/sites/cmk
