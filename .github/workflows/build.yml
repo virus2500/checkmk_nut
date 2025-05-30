@@ -8,12 +8,13 @@ on:
       - 'v*.*.*'
   pull_request:
 
+
 jobs:
   build:
     name: Build Checkmk package
     runs-on: ubuntu-latest
     container:
-      image: ${{ check_mk_image}}
+      image:  ${{ vars.CHECK_MK_IMAGE }}
 
     env:
       OMD_ROOT: /omd/sites/cmk
