@@ -51,12 +51,12 @@ jobs:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
-      - name: Upload artifact (Gitea)
-        if: github.host != 'github.com'
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.cmkpkg.outputs.pkgfile }}
-          path: ${{ steps.cmkpkg.outputs.pkgfile }}
+      # - name: Upload artifact (Gitea)
+      #   if: github.host != 'github.com'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ steps.cmkpkg.outputs.pkgfile }}
+      #     path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
       - name: Get Current Date for Body (optional)
         id: get_current_date
