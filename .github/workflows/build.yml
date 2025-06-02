@@ -90,13 +90,15 @@ jobs:
 #  upload_to_gitea:
   upload:
     name: Upload mkp
-    container:
-      image: gitea.home.lan/mkronika/ubuntu2404:latest
     runs-on: self-hosted
     needs: build_package
 #    if: ${{ !startsWith(github.server_url, 'https://github.com') }} # Only run if NOT on GitHub (i.e., on Gitea)
 
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Download built mkp artifact
         uses: actions/download-artifact@v4
         with:
