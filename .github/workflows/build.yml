@@ -11,10 +11,6 @@ on:
 jobs:
   build_package:
     name: Build Checkmk package
-    # This job will run on 'ubuntu-latest'.
-    # On GitHub, this is GitHub-hosted ubuntu-latest.
-    # On Gitea, this will be your Gitea runner that maps to 'ubuntu-latest' (or its default).
-    # Crucially, this job's internal upload needs to be compatible with Gitea's Node.js.
     runs-on: ubuntu-latest
     container:
       image: ${{ vars.CHECK_MK_IMAGE }}
@@ -54,52 +50,17 @@ jobs:
 #          name: built-mkp-artifact
 #          path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
-<<<<<<< HEAD
-      - name: Upload artifact (GitHub only)
-        if: startsWith(github.server_url, 'https://github.com')
-        uses: actions/upload-artifact@v4
-=======
       - name: Upload artifact (Gitea only)
 #        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
         uses: actions/upload-artifact@v3
->>>>>>> testing
         with:
           name: built-mkp-artifact
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
-
-      - name: Upload artifact (Gitea only)
-        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: built-mkp-artifact
-          path: ${{ steps.cmkpkg.outputs.pkgfile }}
-
-#      - name: Upload mkp artifact for subsequent jobs (Internal Transfer - Gitea compatible)
-#        # *** CRITICAL CHANGE HERE ***
-#        # This MUST be v3 because the build_package job itself runs on Gitea,
-#        # and Gitea's Node.js is too old for v4.
-#        # This will still work on GitHub's newer runners for internal transfer.
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: built-mkp-artifact # A fixed name for the artifact for later download
-#          path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
       - name: Get Current Date for Body (optional)
         id: get_current_date
         run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
 
-<<<<<<< HEAD
-  upload_to_github:
-    name: Upload to GitHub
-    runs-on: ubuntu-latest # This will always be a GitHub-hosted runner
-    needs: build_package # This job depends on the successful build
-    if: ${{ startsWith(github.server_url, 'https://github.com') }} # Only run on GitHub
-
-    steps:
-      - name: Download built mkp artifact
-        # Use v4 for download on GitHub as GitHub's runners support it
-        uses: actions/download-artifact@v4
-=======
 #  upload_to_github:
 #    name: Upload to GitHub
 #    runs-on: ubuntu-latest # This will always be a GitHub-hosted runner
