@@ -22,11 +22,6 @@ jobs:
       WORKSPACE: ${{ github.workspace }}
 
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Initialize Checkmk Site
         run: /docker-entrypoint.sh /bin/true
 
