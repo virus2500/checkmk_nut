@@ -47,14 +47,22 @@ jobs:
           echo "PKGNAME: ${{ steps.cmkpkg.outputs.pkgname }}"
           echo "PKGVERSION: ${{ steps.cmkpkg.outputs.pkgversion }}"
 
-      - name: Debug GitHub context
-        run: |
-          echo "server_url: ${{ github.server_url }}"
-          echo "host: ${{ github.host }}"
+#      - name: Upload artifact (GitHub only)
+#        if: startsWith(github.server_url, 'https://github.com')
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: built-mkp-artifact
+#          path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
+<<<<<<< HEAD
       - name: Upload artifact (GitHub only)
         if: startsWith(github.server_url, 'https://github.com')
         uses: actions/upload-artifact@v4
+=======
+      - name: Upload artifact (Gitea only)
+#        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
+        uses: actions/upload-artifact@v3
+>>>>>>> testing
         with:
           name: built-mkp-artifact
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
@@ -80,6 +88,7 @@ jobs:
         id: get_current_date
         run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
 
+<<<<<<< HEAD
   upload_to_github:
     name: Upload to GitHub
     runs-on: ubuntu-latest # This will always be a GitHub-hosted runner
@@ -90,33 +99,44 @@ jobs:
       - name: Download built mkp artifact
         # Use v4 for download on GitHub as GitHub's runners support it
         uses: actions/download-artifact@v4
-        with:
-          name: built-mkp-artifact
-          path: . # Download to the current directory
+=======
+#  upload_to_github:
+#    name: Upload to GitHub
+#    runs-on: ubuntu-latest # This will always be a GitHub-hosted runner
+#    needs: build_package # This job depends on the successful build
+#    if: ${{ startsWith(github.server_url, 'https://github.com') }} # Only run on GitHub
+#
+#    steps:
+#      - name: Download built mkp artifact
+#        # Use v4 for download on GitHub as GitHub's runners support it
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: built-mkp-artifact
+#          path: . # Download to the current directory
+#
+#      - name: Get artifact filename
+#        id: get_pkg_name
+#        run: |
+#          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
+#
+#      - name: Upload mkp artifact (GitHub)
+#        # Use v4 for final upload to GitHub's artifact storage
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
+#          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
 
-      - name: Get artifact filename
-        id: get_pkg_name
-        run: |
-          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
-
-      - name: Upload mkp artifact (GitHub)
-        # Use v4 for final upload to GitHub's artifact storage
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
-          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
-
-  upload_to_gitea:
-    name: Upload to Gitea
+#  upload_to_gitea:
+  upload:
+    name: Upload mkp
     container:
       image: gitea.home.lan/mkronika/ubuntu2404:latest
-    runs-on: self-hosted # Your specific Gitea runner label
-    needs: build_package # This job depends on the successful build
-    if: ${{ !startsWith(github.server_url, 'https://github.com') }} # Only run if NOT on GitHub (i.e., on Gitea)
+    runs-on: self-hosted
+    needs: build_package
+#    if: ${{ !startsWith(github.server_url, 'https://github.com') }} # Only run if NOT on GitHub (i.e., on Gitea)
 
     steps:
       - name: Download built mkp artifact
-        # Use v3 for download on Gitea due to Node.js compatibility
         uses: actions/download-artifact@v3
         with:
           name: built-mkp-artifact
@@ -127,8 +147,7 @@ jobs:
         run: |
           echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
 
-      - name: Upload mkp artifact (Gitea)
-        # Use v3 for final upload on Gitea due to Node.js compatibility
+      - name: Upload mkp artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.get_pkg_name.outputs.pkgfile }}
