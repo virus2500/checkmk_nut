@@ -9,8 +9,12 @@ on:
   pull_request:
 
 jobs:
-  build_package: # Renamed from 'build' to be more descriptive
+  build_package:
     name: Build Checkmk package
+    # This job will run on 'ubuntu-latest'.
+    # On GitHub, this is GitHub-hosted ubuntu-latest.
+    # On Gitea, this will be your Gitea runner that maps to 'ubuntu-latest' (or its default).
+    # Crucially, this job's internal upload needs to be compatible with Gitea's Node.js.
     runs-on: ubuntu-latest
     container:
       image: ${{ vars.CHECK_MK_IMAGE }}
@@ -48,8 +52,12 @@ jobs:
           echo "server_url: ${{ github.server_url }}"
           echo "host: ${{ github.host }}"
 
-      - name: Upload mkp artifact for subsequent jobs
-        uses: actions/upload-artifact@v4 # Use v4 as it's generally compatible for internal transfer
+      - name: Upload mkp artifact for subsequent jobs (Internal Transfer - Gitea compatible)
+        # *** CRITICAL CHANGE HERE ***
+        # This MUST be v3 because the build_package job itself runs on Gitea,
+        # and Gitea's Node.js is too old for v4.
+        # This will still work on GitHub's newer runners for internal transfer.
+        uses: actions/upload-artifact@v3
         with:
           name: built-mkp-artifact # A fixed name for the artifact for later download
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
@@ -58,16 +66,16 @@ jobs:
         id: get_current_date
         run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
 
-  ---
   upload_to_github:
     name: Upload to GitHub
-    runs-on: ubuntu-latest # GitHub-hosted runner for GitHub uploads
+    runs-on: ubuntu-latest # This will always be a GitHub-hosted runner
     needs: build_package # This job depends on the successful build
     if: ${{ startsWith(github.server_url, 'https://github.com') }} # Only run on GitHub
 
     steps:
       - name: Download built mkp artifact
-        uses: actions/download-artifact@v4 # Download the artifact from the build_package job
+        # Use v4 for download on GitHub as GitHub's runners support it
+        uses: actions/download-artifact@v4
         with:
           name: built-mkp-artifact
           path: . # Download to the current directory
@@ -75,32 +83,27 @@ jobs:
       - name: Get artifact filename
         id: get_pkg_name
         run: |
-          # Use the output from the build_package job directly if you can pass it,
-          # or assume a known name, or find it in the downloaded path.
-          # For simplicity and robustness, let's re-use cmkpkg.outputs.pkgfile
-          # assuming it's consistent.
-          # Note: If cmkpkg.outputs.pkgfile was truly dynamic and not needed elsewhere,
-          # you might need to list the directory to find the file name after download.
-          # For now, let's assume `built-mkp-artifact` downloaded a single file
-          # and we can find its name.
-          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT" # Find the .mkp file
+          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload mkp artifact (GitHub)
-        uses: actions/upload-artifact@v4 # Specific version for GitHub
+        # Use v4 for final upload to GitHub's artifact storage
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.get_pkg_name.outputs.pkgfile }}
           path: ${{ steps.get_pkg_name.outputs.pkgfile }}
 
-  ---
   upload_to_gitea:
     name: Upload to Gitea
-    runs-on: self-hosted # Use your Gitea runner label here
+    container:
+      image: gitea.home.lan/mkronika/ubuntu2404:latest
+    runs-on: self-hosted # Your specific Gitea runner label
     needs: build_package # This job depends on the successful build
     if: ${{ !startsWith(github.server_url, 'https://github.com') }} # Only run if NOT on GitHub (i.e., on Gitea)
 
     steps:
       - name: Download built mkp artifact
-        uses: actions/download-artifact@v4 # Download the artifact from the build_package job
+        # Use v3 for download on Gitea due to Node.js compatibility
+        uses: actions/download-artifact@v3
         with:
           name: built-mkp-artifact
           path: . # Download to the current directory
@@ -108,11 +111,11 @@ jobs:
       - name: Get artifact filename
         id: get_pkg_name
         run: |
-          # Same logic as above for retrieving the filename
-          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT" # Find the .mkp file
+          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload mkp artifact (Gitea)
-        uses: actions/upload-artifact@v3 # Specific version for Gitea (due to Node.js compatibility)
+        # Use v3 for final upload on Gitea due to Node.js compatibility
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.get_pkg_name.outputs.pkgfile }}
           path: ${{ steps.get_pkg_name.outputs.pkgfile }}
