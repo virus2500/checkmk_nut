@@ -12,7 +12,7 @@
            'lib': ['check_mk/base/cee/plugins/bakery/bakery_nut.py']},
  'name': 'nut',
  'title': 'Network UPS Tools',
- 'version': '3.0.2',
+ 'version': '3.0.3',
  'version.min_required': '2.3.0b1',
  'version.packaged': '2.4.0p2',
  'version.usable_until': None}
