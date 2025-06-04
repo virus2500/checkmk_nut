@@ -43,28 +43,6 @@ jobs:
           echo "PKGNAME: ${{ steps.cmkpkg.outputs.pkgname }}"
           echo "PKGVERSION: ${{ steps.cmkpkg.outputs.pkgversion }}"
 
-      #- name: Get Current Date for Body (optional)
-      #  id: get_current_date
-      #  run: echo "date=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
-
-      #- name: Install Node 18 via NodeSource
-      #  run: |
-      #    # 1) Remove any existing Node 12 packages that conflict
-      #    apt-get update -y
-      #    apt-get remove -y nodejs libnode-dev || true
-      #    apt-get autoremove -y
-
-      #    # 2) Install curl/gnupg so we can fetch the NodeSource script
-      #    apt-get install -y curl ca-certificates gnupg
-
-      #    # 3) Add NodeSource’s Node 18 repo and install nodejs
-      #    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-      #    apt-get install -y nodejs
-
-
-      #- name: Check Node version
-      #  run: node --version
-
       - name: Confirm MKP file exists
         run: ls -l ${{ steps.cmkpkg.outputs.pkgfile }}
 
@@ -74,68 +52,3 @@ jobs:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}
 
-#      - name: Upload artifact (GitHub only)
-#        if: startsWith(github.server_url, 'https://github.com')
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: built-mkp-artifact
-#          path: ${{ steps.cmkpkg.outputs.pkgfile }}
-#
-#      - name: Upload artifact (Gitea only)
-#        if: ${{ !startsWith(github.server_url, 'https://github.com') }}
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: built-mkp-artifact
-#          path: ${{ steps.cmkpkg.outputs.pkgfile }}
-#
-#
-#  upload_to_github:
-#    name: Upload to GitHub
-#    runs-on: ubuntu-latest
-#    needs: build_package
-#    if: ${{ startsWith(github.server_url, 'https://github.com') }}
-#
-#    steps:
-#      - name: Download built mkp artifact
-#        # Use v4 for download on GitHub as GitHub's runners support it
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: built-mkp-artifact
-#          path: . # Download to the current directory
-#
-#      - name: Get artifact filename
-#        id: get_pkg_name
-#        run: |
-#          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
-#
-#      - name: Upload mkp artifact (GitHub)
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
-#          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
-#
-#  upload_to_gitea:
-#    name: Upload to Gitea
-#    container:
-#      image: gitea.home.lan/mkronika/ubuntu2404:latest
-#    runs-on: self-hosted
-#    needs: build_package
-#    if: ${{ !startsWith(github.server_url, 'https://github.com') }}
-#
-#    steps:
-#      - name: Download built mkp artifact
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: built-mkp-artifact
-#          path: . # Download to the current directory
-#
-#      - name: Get artifact filename
-#        id: get_pkg_name
-#        run: |
-#          echo "pkgfile=$(ls *.mkp | head -n 1)" >> "$GITHUB_OUTPUT"
-#
-#      - name: Upload mkp artifact (Gitea)
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: ${{ steps.get_pkg_name.outputs.pkgfile }}
-#          path: ${{ steps.get_pkg_name.outputs.pkgfile }}
