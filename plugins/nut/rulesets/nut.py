@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 '''
 Description:
-    This module defines the rule specifications for monitoring UPS (Uninterruptible Power Supply) parameters
-    using Network UPS Tools (NUT).
+This module defines the rule specifications for monitoring
+UPS (Uninterruptible Power Supply) parameters using Network UPS Tools (NUT).
 '''
 from collections.abc import Mapping
 
@@ -21,8 +21,8 @@ from cmk.rulesets.v1.form_specs import (
 from cmk.rulesets.v1.rule_specs import (
     Dictionary,
     CheckParameters,
+    HostAndItemCondition,
     Topic,
-    HostCondition,
     Help,
 )
 
@@ -231,6 +231,6 @@ rule_spec_nut = CheckParameters(
     name="nut",
     title=Title("Network UPS Tools"),
     topic=Topic.APPLICATIONS,
-    condition=HostCondition(),
+    condition=HostAndItemCondition(item_title=Title("UPS Name (e.g. ups@192.168.0.1)")),
     parameter_form=_parameter_valuespec_nut,
 )
