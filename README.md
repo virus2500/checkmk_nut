@@ -35,7 +35,7 @@ Contributions are welcome! If you encounter issues or have suggestions for impro
 This project is licensed under the GNU General Public License v2. See the LICENSE file for details.
 
 ## Acknowledgments
-Inspired by the original NUT plugin by Daniel Karni and Marcel Pennewiss.
+Inspired by the original NUT plugin by Daniel Karni and [Marcel Pennewiss](https://github.com/mape2k/).
 
 ## References
 [Network UPS Tools (NUT)](https://networkupstools.org/)
