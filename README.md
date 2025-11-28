@@ -24,6 +24,7 @@ Additionally, it includes an agent bakery implementation to automate the deploym
 ## Installation
 
 ### Manual Installation Guide (Client & Server)
+
 This section describes how to manually install the NUT plugin on both the Checkmk server and the monitored client, which is running NUT-Server.  
 
 > ⚠️ **Important:** Tested with **Checkmk Raw Edition 2.4.0p14** and a local **NUT server** (`upsd`) running on the monitored host.
@@ -31,6 +32,9 @@ This section describes how to manually install the NUT plugin on both the Checkm
 **Server Installation**
 
 Install the Checkmk extension package (`mkp`) on the server:
+
+***Note: Replace \<version\> with the current version e.g. 3.0.4***
+
 ```bash
 # Switch to your Checkmk site user (e.g., cmk)
 su - cmk
@@ -53,29 +57,35 @@ mkp list
 ```bash
 # Download the plugin script to the Checkmk agent plugins directory
 # Option 1: From the internet
-wget https://raw.githubusercontent.com/virus2500/checkmk_nut/refs/heads/main/local/share/check_mk/agents/plugins/nut.sh -O /usr/lib/check_mk_agent/plugins/nut.sh
+sudo wget https://raw.githubusercontent.com/virus2500/checkmk_nut/refs/heads/main/local/share/check_mk/agents/plugins/nut.sh -O /usr/lib/check_mk_agent/plugins/nut.sh
+sudo chmod +x /usr/lib/check_mk_agent/plugins/nut.sh 
+
 
 # Option 2: If your agent host has no internet access, copy it from the Checkmk site
+## From your Checkmk server to the target host
 scp ~/local/share/check_mk/agents/plugins/nut.sh user@target-host:/tmp/
-sudo mv /tmp/nut.sh /usr/lib/check_mk_agent/plugins/nut.sh
 
-# Make the script executable
-chmod +x /usr/lib/check_mk_agent/plugins/nut.sh 
+## On the target host
+sudo mv /tmp/nut.sh /usr/lib/check_mk_agent/plugins/nut.sh
+sudo chmod +x /usr/lib/check_mk_agent/plugins/nut.sh 
 ```
 
 See [MPK install](https://docs.checkmk.com/latest/en/mkps.html) for more information
 
-
 ## Contributing
+
 Contributions are welcome! If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
 
 ## License
+
 This project is licensed under the GNU General Public License v2. See the LICENSE file for details.
 
 ## Acknowledgments
+
 Inspired by the original NUT plugin by Daniel Karni and [Marcel Pennewiss](https://github.com/mape2k/).
 
 ## References
+
 [Network UPS Tools (NUT)](https://networkupstools.org/)
 
 [Checkmk](https://checkmk.com/)
