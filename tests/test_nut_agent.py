@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''Agent tests for the NUT plugin in Checkmk.'''
 
-from cmk.agent_based.v2 import Result, State
+from cmk.agent_based.v2 import Metric, Result, State
 from plugins.nut.agent_based.nut import nut_parse, check_nut
 
 
@@ -92,3 +92,47 @@ def test_check_nut_beeper_status_critical():
     summaries = [r.summary for r in results if isinstance(r, Result)]
     assert State.CRIT in states
     assert any("Beeper: disabled" in s for s in summaries)
+
+
+def _battery_voltage_metric(section):
+    params = {
+        "ups_beeper_status": "ignore",
+        "battery_voltage": ("fixed", (10, 5)),
+    }
+    results = list(check_nut("demo_ups", params, section))
+    return next(r.value for r in results if isinstance(r, Metric) and r.name == "nut_battery_voltage")
+
+
+def test_check_nut_battery_voltage_zero_packs():
+    section = {
+        "demo_ups": {
+            "ups_status": "OL",
+            "ups_beeper_status": "enabled",
+            "battery_voltage": 25.0,
+            "battery_packs": 0,
+        }
+    }
+    assert _battery_voltage_metric(section) == 25.0
+
+
+def test_check_nut_battery_voltage_multiple_packs():
+    section = {
+        "demo_ups": {
+            "ups_status": "OL",
+            "ups_beeper_status": "enabled",
+            "battery_voltage": 2.16,
+            "battery_packs": 6,
+        }
+    }
+    assert _battery_voltage_metric(section) == 2.16 * 6
+
+
+def test_check_nut_battery_voltage_missing_packs():
+    section = {
+        "demo_ups": {
+            "ups_status": "OL",
+            "ups_beeper_status": "enabled",
+            "battery_voltage": 25.0,
+        }
+    }
+    assert _battery_voltage_metric(section) == 25.0

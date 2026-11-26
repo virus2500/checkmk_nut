@@ -260,9 +260,10 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
         if metric not in _METRIC_SPECS:
             continue
 
-        # Calculate real voltage
+        value = ups_data[metric]
+        # Calculate real voltage. apcsmart reports 0 packs for standalone UPSs; clamp to 1
         if metric == 'battery_voltage':
-            ups_data[metric] = ups_data[metric] * ups_data.get('battery_packs', 1)
+            value = value * max(ups_data.get('battery_packs') or 1, 1)
 
         metric_params = params.get(metric)
 
@@ -279,7 +280,7 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
                 levels_upper = None
 
         yield from check_levels(
-            ups_data[metric],
+            value,
             metric_name=f"nut_{metric}",
             label=_METRIC_SPECS[metric][0],
             levels_lower=levels_lower,
