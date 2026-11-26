@@ -15,8 +15,10 @@ ln -sv $WORKSPACE/agent_based $OMD_ROOT/local/lib/python3/cmk/base/plugins/agent
 rm -rfv $OMD_ROOT/local/lib/python3/cmk_addons/plugins
 ln -sv $WORKSPACE/plugins $OMD_ROOT/local/lib/python3/cmk_addons/plugins
 
+# Copy instead of symlinking: newer GNU tar rejects symlinks escaping -C (EXDEV) on mkp reinstall
+rm -rfv $OMD_ROOT/local/lib/check_mk/base/cee/plugins/bakery
 mkdir -p $OMD_ROOT/local/lib/check_mk/base/cee/plugins
-ln -sv $WORKSPACE/lib/base/cee/plugins/bakery $OMD_ROOT/local/lib/check_mk/base/cee/plugins/bakery
+cp -av $WORKSPACE/lib/base/cee/plugins/bakery $OMD_ROOT/local/lib/check_mk/base/cee/plugins/bakery
 
 rm -rfv $OMD_ROOT/local/lib/nagios/plugins
 ln -sv $WORKSPACE/nagios_plugins $OMD_ROOT/local/lib/nagios/plugins
