@@ -136,3 +136,33 @@ def test_check_nut_battery_voltage_missing_packs():
         }
     }
     assert _battery_voltage_metric(section) == 25.0
+
+
+def test_nut_parse_ignores_non_numeric_values():
+    string_table = [
+        ["==>", "demo_ups", "<=="],
+        ["battery.packs:", "N/A"],
+        ["battery.voltage:", "invalid"],
+        ["battery.charge:", "100"],
+        ["ups.status:", "OL"],
+    ]
+    parsed = nut_parse(string_table)
+    assert "battery_packs" not in parsed["demo_ups"]
+    assert "battery_voltage" not in parsed["demo_ups"]
+    assert parsed["demo_ups"]["battery_charge"] == 100.0
+
+
+def test_check_nut_missing_ups_status():
+    section = {
+        "demo_ups": {
+            "ups_beeper_status": "enabled",
+            "battery_charge": 100.0,
+        }
+    }
+    params = {
+        "ups_beeper_status": "enabled",
+        "battery_charge": ("fixed", (90, 85)),
+    }
+    results = list(check_nut("demo_ups", params, section))
+    states = [r.state for r in results if isinstance(r, Result)]
+    assert State.OK in states

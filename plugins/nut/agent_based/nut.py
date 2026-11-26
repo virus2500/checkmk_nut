@@ -135,22 +135,25 @@ def nut_parse(string_table: StringTable) -> Section:
             key = key.replace('.', '_').replace(':', '')
 
             # Convert several keys/values
-            if key in [
-                    'battery_charge',
-                    'battery_runtime',
-                    'battery_voltage',
-                    'input_frequency',
-                    'input_voltage',
-                    'input_voltage_fault',
-                    'output_voltage',
-                    'ups_load',
-                    'ups_temperature'
-            ]:
-                parsed[ups_name][key] = float(val)
-            elif key in ['battery_packs']:
-                parsed[ups_name][key] = int(val)
-            elif key in ['ups_status', 'ups_beeper_status']:
-                parsed[ups_name][key] = val
+            try:
+                if key in [
+                        'battery_charge',
+                        'battery_runtime',
+                        'battery_voltage',
+                        'input_frequency',
+                        'input_voltage',
+                        'input_voltage_fault',
+                        'output_voltage',
+                        'ups_load',
+                        'ups_temperature'
+                ]:
+                    parsed[ups_name][key] = float(val)
+                elif key in ['battery_packs']:
+                    parsed[ups_name][key] = int(val)
+                elif key in ['ups_status', 'ups_beeper_status']:
+                    parsed[ups_name][key] = val
+            except ValueError:
+                continue
 
     return parsed
 
@@ -229,7 +232,7 @@ def check_nut(item: str, params: Mapping[str, Any], section: Section) -> CheckRe
 
     # Check UPS status
     # print(f"Checking UPS: {item}")
-    for status in ups_data['ups_status'].split():
+    for status in ups_data.get('ups_status', '').split():
         # print(f"Status: {status}")
         if status in _STATUS_SPECS:
             yield Result(
