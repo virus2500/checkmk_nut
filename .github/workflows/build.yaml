@@ -47,7 +47,7 @@ jobs:
         run: ls -l ${{ steps.cmkpkg.outputs.pkgfile }}
 
       - name: Upload mkp artifact
-        uses: ${{ github.server_url == 'https://github.com' && 'actions/upload-artifact@v4' || 'actions/upload-artifact@v3' }}
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.cmkpkg.outputs.pkgfile }}
           path: ${{ steps.cmkpkg.outputs.pkgfile }}

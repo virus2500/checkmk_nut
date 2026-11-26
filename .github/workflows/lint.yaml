@@ -9,9 +9,6 @@ jobs:
   flake8-lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Disable git SSL verification
-      run: git config --global http.sslVerify false
-
     - uses: actions/checkout@v3
 
     - name: Set up Python environment

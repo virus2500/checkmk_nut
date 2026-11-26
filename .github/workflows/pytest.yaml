@@ -20,14 +20,6 @@ jobs:
     - name: Initialize Checkmk Site
       run: /docker-entrypoint.sh /bin/true
     - uses: actions/checkout@v2
-    # - name: Setup links
-    #   run: ./.devcontainer/symlink.sh
-    # - name: Install extra packages (GitHub only)
-    #   if: ${{ github.server_url == 'https://github.com' }}
-    #   run: |
-    #     apt-get update
-    #     apt-get upgrade -y
-    #     apt-get install -y wget curl gnupg lsb-release ca-certificates build-essential nodejs npm flake8
 
     - name: Install pytest
       run: su -l -c "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt pip3 install -r $GITHUB_WORKSPACE/.devcontainer/requirements.txt" cmk
